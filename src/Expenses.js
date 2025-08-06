@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+// ✅ FIXED for Vite
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+console.log("Using API URL:", API_BASE_URL);
 
 export default function Expenses() {
   const navigate = useNavigate();
@@ -17,7 +19,7 @@ export default function Expenses() {
   });
   const [filterYear, setFilterYear] = useState("");
   const [filterMonth, setFilterMonth] = useState("");
-  const [editId, setEditId] = useState(null); // 🆕 Track which expense is editing
+  const [editId, setEditId] = useState(null);
 
   const access = localStorage.getItem("access");
 
@@ -37,11 +39,11 @@ export default function Expenses() {
         headers: {
           Authorization: `Bearer ${access}`,
         },
-        params: params,
+        params,
       });
       setExpenses(response.data);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching expenses:", error);
     }
   };
 
@@ -52,37 +54,20 @@ export default function Expenses() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editId) {
-        // 📝 Update existing
-        await axios.put(
-          `${API_BASE_URL}/api/expenses/${editId}/`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${access}`,
-            },
-          }
-        );
+        await axios.put(`${API_BASE_URL}/api/expenses/${editId}/`, formData, {
+          headers: { Authorization: `Bearer ${access}` },
+        });
       } else {
-        // ➕ Create new
-        await axios.post(
-          `${API_BASE_URL}/api/expenses/`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${access}`,
-            },
-          }
-        );
+        await axios.post(`${API_BASE_URL}/api/expenses/`, formData, {
+          headers: { Authorization: `Bearer ${access}` },
+        });
       }
       setFormData({
         name: "",
@@ -95,7 +80,7 @@ export default function Expenses() {
       setEditId(null);
       fetchExpenses();
     } catch (error) {
-      console.error(error);
+      console.error("Error submitting form:", error);
     }
   };
 
@@ -114,20 +99,15 @@ export default function Expenses() {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${API_BASE_URL}/api/expenses/${id}/`, {
-        headers: {
-          Authorization: `Bearer ${access}`,
-        },
+        headers: { Authorization: `Bearer ${access}` },
       });
       fetchExpenses();
     } catch (error) {
-      console.error(error);
+      console.error("Error deleting expense:", error);
     }
   };
 
-  const total = expenses.reduce(
-    (sum, exp) => sum + parseFloat(exp.amount),
-    0
-  );
+  const total = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
 
   return (
     <div className="min-h-screen p-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white">
