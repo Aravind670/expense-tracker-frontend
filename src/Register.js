@@ -6,6 +6,9 @@ export default function Register() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
+  // Use VITE_API_BASE_URL or fallback to local for safety
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -14,7 +17,7 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      await axios.post("http://127.0.0.1:8000/api/register/", formData);
+      await axios.post(`${API_BASE_URL}/api/register/`, formData);
       alert("Registration successful!");
       navigate("/login"); // Redirect to login
     } catch (error) {

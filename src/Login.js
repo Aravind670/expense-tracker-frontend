@@ -6,6 +6,9 @@ export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
+  // Use the backend URL from the environment, fallback to localhost if needed
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -14,7 +17,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/token/", formData);
+      const response = await axios.post(`${API_BASE_URL}/api/token/`, formData);
 
       localStorage.setItem("access", response.data.access);
       localStorage.setItem("refresh", response.data.refresh);

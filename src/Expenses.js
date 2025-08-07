@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Mainpage = () => {
+function Expenses() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
   const navigate = useNavigate();
   const [expenses, setExpenses] = useState([]);
@@ -44,7 +44,7 @@ const Mainpage = () => {
     }
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_BASE_URL}/api/expenses/`,
         {
           expense_name: expenseName,
@@ -63,7 +63,6 @@ const Mainpage = () => {
       setAmount("");
       setCategory("");
       setDate("");
-
       fetchExpenses();
     } catch (error) {
       console.error("Error adding expense:", error);
@@ -156,6 +155,6 @@ const Mainpage = () => {
       </ul>
     </div>
   );
-};
+}
 
-export default Mainpage;
+export default Expenses;
